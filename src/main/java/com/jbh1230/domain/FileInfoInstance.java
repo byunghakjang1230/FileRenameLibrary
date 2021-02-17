@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.util.Date;
 
 import com.jbh1230.constants.FileTypeConst;
-import com.jbh1230.utils.FileUtil;
+import com.jbh1230.util.FileUtil;
 
 public class FileInfoInstance {
 	private File fileInstance;
@@ -25,6 +25,8 @@ public class FileInfoInstance {
 		this.extesion 	  = FileUtil.getExtension(file).toLowerCase();
 		this.folderPath	  = FileUtil.getFolderPath(file);
 		this.fileType	  = FileTypeConst.findType(extesion);
+		
+		
 	}
 	
 	public boolean checkType(FileTypeConst type) {
@@ -59,12 +61,12 @@ public class FileInfoInstance {
 		return this.fileType;
 	}
 	
-	public boolean renameTo(String toFileName) {
-		File newfile = new File(this.folderPath + "/" + toFileName);
-		if(!newfile.exists())
-			return this.fileInstance.renameTo(newfile);
-		else
-			return false;
+	public boolean renameTo(String toFileName) throws IOException {
+		return renameTo(new File(toFileName));
+	}
+	
+	public boolean renameTo(File toFile) throws IOException {
+		return this.fileInstance.renameTo(toFile);
 	}
 	
 	public boolean moveTo(String toFileName) throws IOException {

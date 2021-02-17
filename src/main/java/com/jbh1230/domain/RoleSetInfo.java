@@ -4,7 +4,8 @@ import java.text.ParseException;
 import java.util.Date;
 
 import com.jbh1230.constants.FileTypeConst;
-import com.jbh1230.utils.DateTimeUtil;
+import com.jbh1230.util.DateUtil;
+
 
 public class RoleSetInfo {
 
@@ -37,7 +38,7 @@ public class RoleSetInfo {
 	
 	public RoleSetInfo setStartDate(String yyyyMMddHHmmss) {
 		try {
-			this.startDate = DateTimeUtil.transStringToDate(yyyyMMddHHmmss, "yyyyMMddHHmmss");
+			this.startDate = DateUtil.transStringToDate(yyyyMMddHHmmss, "yyyyMMddHHmmss");
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

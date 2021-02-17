@@ -3,17 +3,11 @@ package com.jbh1230.service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.jbh1230.constants.FileTypeConst;
 import com.jbh1230.domain.FileInfoInstance;
-import com.jbh1230.domain.RoleSetInfo;
-import com.jbh1230.utils.DateTimeUtil;
-import com.jbh1230.utils.StringUtil;
+import com.jbh1230.util.DateUtil;
+import com.jbh1230.util.StringUtil;
 
 public class FileRename extends FileBase {
 
@@ -32,32 +26,57 @@ public class FileRename extends FileBase {
 		List<FileInfoInstance> list = readFileList();
 		String newFilename;
 		StringBuilder sb;
+		String yyyy;
+		String mm;
+		File newFile;
+		int seq;
+		
+		String bfName;
+		String afName;
+		
 		for(FileInfoInstance file : list) {
+			//각각의 파일마다 새롭게 사용될 변수 초기화.
 			sb = new StringBuilder();
-			switch(file.getFileType()) {
-			case IMAGE: sb.append("IMG_"); break;
-			case VIDEO: sb.append("MOV_"); break;
-			default: sb.append("NON_");
-			}
+			seq = 0;
 			
 			try {
-				newFilename = DateTimeUtil.transDateToString(file.getCreateTimeToDate(), "yyyyMMdd_HHmmss");
-				seq 		= fileNameMap.containsKey(newFilename) ? fileNameMap.get(newFilename) + 1 : 0;
-				fileNameMap.put(newFilename, seq);
-				sb.append(newFilename)
-				  .append("_")
-				  .append(StringUtil.lpad(seq, 4))
-				  .append(".")
-				  .append(file.getExtension());
+				//파일이동 경로를 셋팅하는데 필요한 값들을 세팅.
+				yyyy		= DateUtil.transDateToString(file.getCreateTimeToDate(), "yyyy");
+				mm			= DateUtil.transDateToString(file.getCreateTimeToDate(), "MM");
+				newFilename = DateUtil.transDateToString(file.getCreateTimeToDate(), "yyyyMMdd_HHmmss");
+
+				//파일경로 문자열 조립.
+				sb.append(file.getFolderPath());
+				sb.append("/");
 				
-				//파일 이름 변경 수행.
-				file.renameTo(sb.toString());
-				//System.out.println(sb.toString());
+				switch(file.getFileType()) {
+				case IMAGE: sb.append("IMG_"); break;
+				case VIDEO: sb.append("MOV_"); break;
+				default	  : sb.append("NON_");
+				}
+				
+				sb.append(newFilename)
+				  .append("_");
+				
+				//동일한 파일명에 동일한 시퀀스가 이미 존재할 경우 반복문을 돌면서 시퀀스를 1씩 올림.
+				do {
+					newFile = new File(sb.toString() + StringUtil.lpad(seq++, 4) + "." + file.getExtension());
+				} while(newFile.exists());				
+
+				bfName = file.getFileInstance().getName();
+				afName = newFile.getName();
+				
+				file.renameTo(newFile);
+				
+				System.out.println(" > SUCCEED : " + afName + "  <<==  " + bfName);
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				System.out.println("Exception");
+				System.out.println("** Exception ** ");
+				System.out.println("  |- File Name : " + file.getFileName());
+				System.out.println("  |- File Path : " + file.getFolderPath());
 			}
 		}
-		System.out.println("     -------- Rename Finished --------     ");
+		System.out.println("     -------- Move Finished --------     ");
 	}
 }

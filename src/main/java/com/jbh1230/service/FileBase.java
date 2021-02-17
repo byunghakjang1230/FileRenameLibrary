@@ -53,7 +53,7 @@ public class FileBase {
 		List<FileInfoInstance> list = new ArrayList<>();
 		FileInfoInstance fii;
 		for(File file : this.baseFolderFile.listFiles()) {
-			if(file.isDirectory())
+			if(file.isDirectory() || !file.exists())
 				continue;
 			fii = new FileInfoInstance(file);
 			if(fii.checkType(FileTypeConst.EMPTY))
